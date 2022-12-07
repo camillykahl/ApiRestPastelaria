@@ -94,3 +94,16 @@ def delete_funcionario(id: int):
         return {"msg": "Erro ao excluir", "erro": str(e)}, 406
     finally:
         session.close()
+        
+# valida o cpf e senha informado pelo usuário
+@router.post("/funcionario/login/", tags=["funcionario"])
+def login_funcionario(corpo: Funcionario):
+	try:
+		session = db.Session()
+		# one(), requer que haja apenas um resultado no conjunto de resultados - é um erro se o banco de dados retornar 0, 2 ou mais resultados e uma exceção é gerada
+		dados = session.query(FuncionarioDB).filter(FuncionarioDB.cpf == corpo.cpf).filter(FuncionarioDB.senha == corpo.senha).one()
+		return dados, 200
+	except Exception as e:
+		return {"msg": "Falha de login", "erro": str(e)}, 404
+	finally:
+		session.close()
